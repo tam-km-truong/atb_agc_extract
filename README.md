@@ -5,12 +5,12 @@ A prototype script to download genomes from phylogenetically compressed [1] ATB 
 ## Usage
 
 ```bash
-./agc_extract.sh <accession_id> <output> [thread] [archives_folder] [file_list]
+./agc_extract.sh <accession_id> [output] [thread] [archives_folder] [file_list]
 ```
 
 ## Example
 ```bash
-./agc_extract.sh SAMEA104410971 ./extracted.fa
+./agc_extract.sh SAMEA104410971
 ```
 
 REFERENCE:

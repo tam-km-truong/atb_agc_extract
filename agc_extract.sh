@@ -1,20 +1,20 @@
 #!/bin/bash
 
-if [ "$#" -lt 2 ]; then
-    echo "Usage: ./agc_extract.sh <accession_id> <output> [thread] [archives_folder] [file_list]"
-    echo "Example: ./agc_extract.sh agc_extract.sh SAMEA104410971 ./extracted.fa"
-    exit 1
-fi
-
 if ! command -v agc >/dev/null 2>&1; then
     echo "Error: 'agc' is not installed. Please install it first."
     echo "Run: conda install -c bioconda agc"
     exit 1
 fi
 
+if [ "$#" -lt 1 ] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+    echo "Usage: ./agc_extract.sh <accession_id> [output] [thread] [archives_folder] [file_list]"
+    echo "Example: ./agc_extract.sh agc_extract.sh SAMEA104410971"
+    exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 GEN_ID="$1"
-OUTPUT="$2"
+OUTPUT="${2:--}"
 THREAD="${3:-1}"
 ARCHIVES_FOLDER="${4:-$SCRIPT_DIR/archives}"
 FILE_LIST="${5:-$SCRIPT_DIR/file_list.txt}"
@@ -49,6 +49,10 @@ fi
 
 echo
 echo "Measuring time for AGC extraction:" >&2
-time agc getset -t "$THREAD" "$ARCHIVES_FOLDER/$GEN_ARCHIVE.agc" "$GEN_ID" > $OUTPUT
-echo
-echo "Extracted to $OUTPUT." >&2
+if [ "$OUTPUT" = "-" ]; then
+    time agc getset -t "$THREAD" "$ARCHIVES_FOLDER/$GEN_ARCHIVE.agc" "$GEN_ID"
+else
+    # Ensure the parent directory exists if writing to a file
+    mkdir -p "$(dirname "$OUTPUT")"
+    time agc getset -t "$THREAD" "$ARCHIVES_FOLDER/$GEN_ARCHIVE.agc" "$GEN_ID" > "$OUTPUT"
+fi
